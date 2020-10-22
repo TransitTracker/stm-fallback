@@ -11,10 +11,10 @@ exports.handler = async (event, context) => {
     const fakeFeed = new GtfsRealtimeBindings.transit_realtime.FeedMessage({
         header: fakeFeedHeader
     });
-    let finalFeed = fakeFeed;
+    let finalFeed = GtfsRealtimeBindings.transit_realtime.FeedMessage.encode(fakeFeed).finish().toString();
 
     // Make request to STM server
-    axios.request({
+    await axios.request({
         url: 'vehiclePositions',
         baseURL: 'https://api.stm.info/pub/od/gtfs-rt/ic/v1/',
         method: 'post',
@@ -35,11 +35,11 @@ exports.handler = async (event, context) => {
                     console.log('The feed is up to date!');
                 }
             } catch (error) {
-                console.log('Oops! Something went wrong.', error);
+                console.log('Oops! Something went wrong:', error);
             }
         })
         .catch(error => {
-            console.log('Error while trying to fetch the feed.', error.message);
+            console.log('Error while trying to fetch the feed:', error.message);
         });
 
     return {
